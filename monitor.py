@@ -70,26 +70,36 @@ def get_channel_details(service, channel_ids):
         channel_map[item['id']] = int(item['statistics']['subscriberCount'])
     return channel_map
 
-def send_push(title, url, views, subs, multiplier):
+def send_push(title, url, views, subs, multiplier, thumb_url):
     if not PUSH_KEY:
         print("No PUSH_KEY found, skipping notification.")
         return
 
     # Check if PUSH_KEY is for PushDeer (starts with PDU) or ServerChan (SCT)
     if PUSH_KEY.startswith("PDU"):
-        # PushDeer
+        # PushDeer - Markdown Mode
         base_url = "https://api2.pushdeer.com/message/push"
-        text = f"Found Black Horse Video!\nTitle: {title}\nViews: {views} | Subs: {subs}\nMultiplier: {multiplier:.1f}x\n{url}"
+        
+        # Format: Title as text, detailed markdown body as desp
+        text = f"🔥 黑马视频: {views}播放 / {subs}订阅"
+        desp = f"### [{title}]({url})\n\n![cover]({thumb_url})\n\n- **播放**: {views}\n- **订阅**: {subs}\n- **爆发倍数**: {multiplier:.1f}x\n\n[>>> 点击观看视频]({url})"
+        
         try:
-            res = requests.get(base_url, params={"pushkey": PUSH_KEY, "text": text})
+            res = requests.get(base_url, params={
+                "pushkey": PUSH_KEY, 
+                "text": text,
+                "desp": desp,
+                "type": "markdown"
+            })
             print(f"Notification sent for: {title}. Response: {res.status_code} {res.text}")
         except Exception as e:
             print(f"Failed to send notification: {e}")
+            
     else:
         # ServerChan (Turbo)
         base_url = f"https://sctapi.ftqq.com/{PUSH_KEY}.send"
-        title_short = f"Black Horse: {multiplier:.1f}x Multiplier"
-        desp = f"Title: {title}\n\n[Watch Video]({url})\n\nViews: {views}\nSubs: {subs}"
+        title_short = f"黑马: {multiplier:.1f}倍爆发"
+        desp = f"![cover]({thumb_url})\n\n### [{title}]({url})\n\n| 指标 | 数据 |\n| --- | --- |\n| 👁️ 播放 | {views} |\n| 👥 订阅 | {subs} |\n| 🔥 倍数 | {multiplier:.1f}x |\n\n[点击跳转观看]({url})"
         try:
             res = requests.post(base_url, data={"title": title_short, "desp": desp})
             print(f"Notification sent for: {title}. Response: {res.status_code} {res.text}")
@@ -132,8 +142,13 @@ def main():
             video_id = video['id']
             url = f"https://www.youtube.com/watch?v={video_id}"
             
+            # Extract high res thumbnail
+            thumb_url = video['snippet']['thumbnails'].get('high', {}).get('url', '')
+            if not thumb_url:
+                thumb_url = video['snippet']['thumbnails'].get('medium', {}).get('url', '')
+            
             print(f"[MATCH] {title} (Views: {views}, Subs: {subs}, Mult: {multiplier:.1f}x)")
-            send_push(title, url, views, subs, multiplier)
+            send_push(title, url, views, subs, multiplier, thumb_url)
             found_count += 1
             
     print(f"Done. Found {found_count} black horse videos.")
