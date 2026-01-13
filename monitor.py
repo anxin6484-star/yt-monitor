@@ -80,15 +80,21 @@ def send_push(title, url, views, subs, multiplier):
         # PushDeer
         base_url = "https://api2.pushdeer.com/message/push"
         text = f"Found Black Horse Video!\nTitle: {title}\nViews: {views} | Subs: {subs}\nMultiplier: {multiplier:.1f}x\n{url}"
-        requests.get(base_url, params={"pushkey": PUSH_KEY, "text": text})
+        try:
+            res = requests.get(base_url, params={"pushkey": PUSH_KEY, "text": text})
+            print(f"Notification sent for: {title}. Response: {res.status_code} {res.text}")
+        except Exception as e:
+            print(f"Failed to send notification: {e}")
     else:
         # ServerChan (Turbo)
         base_url = f"https://sctapi.ftqq.com/{PUSH_KEY}.send"
         title_short = f"Black Horse: {multiplier:.1f}x Multiplier"
         desp = f"Title: {title}\n\n[Watch Video]({url})\n\nViews: {views}\nSubs: {subs}"
-        requests.post(base_url, data={"title": title_short, "desp": desp})
-        
-    print(f"Notification sent for: {title}")
+        try:
+            res = requests.post(base_url, data={"title": title_short, "desp": desp})
+            print(f"Notification sent for: {title}. Response: {res.status_code} {res.text}")
+        except Exception as e:
+            print(f"Failed to send notification: {e}")
 
 def main():
     service = get_service()
