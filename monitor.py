@@ -82,7 +82,7 @@ def send_push(title, url, views, subs, multiplier, thumb_url):
         
         # Format: Title as text, detailed markdown body as desp
         text = f"🔥 黑马视频: {views}播放 / {subs}订阅"
-        desp = f"### [{title}]({url})\n\n![cover]({thumb_url})\n\n- **播放**: {views}\n- **订阅**: {subs}\n- **爆发倍数**: {multiplier:.1f}x\n\n[>>> 点击观看视频]({url})"
+        desp = f"### [{title}]({url})\n\n![cover]({thumb_url})\n\n- **播放**: {views}\n- **订阅**: {subs}\n- **爆发倍数**: {multiplier:.1f}x\n\n[>>> 点击观看视频]({url})\n\n{url}"
         
         try:
             res = requests.get(base_url, params={
