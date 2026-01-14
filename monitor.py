@@ -84,6 +84,13 @@ def get_channel_details(service, channel_ids):
 def download_video(url, video_id):
     """Download video using yt-dlp"""
     print(f"Downloading {url}...")
+    cookie_path = 'cookies.txt'
+    if os.path.exists(cookie_path):
+        print(f"Using cookies from {cookie_path}")
+    else:
+        print("Warning: cookies.txt not found!")
+        cookie_path = None
+
     ydl_opts = {
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
         'outtmpl': f'{DOWNLOAD_DIR}/{video_id}.%(ext)s',
@@ -91,15 +98,13 @@ def download_video(url, video_id):
         'no_warnings': True,
         'user_agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.1',
         'referer': 'https://www.youtube.com/',
-        'external_downloader': 'aria2c',
-        'external_downloader_args': ['--min-split-size=1M', '--max-connection-per-server=8'],
         'extractor_args': {
             'youtube': {
-                'player_client': ['ios', 'android', 'web'],
+                'player_client': ['mweb', 'ios'],
             }
         },
         'nocheckcertificate': True,
-        'cookiefile': 'cookies.txt' if os.path.exists('cookies.txt') else None,
+        'cookiefile': cookie_path,
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
