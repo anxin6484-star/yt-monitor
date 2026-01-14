@@ -99,6 +99,7 @@ def download_video(url, video_id):
             }
         },
         'nocheckcertificate': True,
+        'cookiefile': 'cookies.txt' if os.path.exists('cookies.txt') else None,
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:

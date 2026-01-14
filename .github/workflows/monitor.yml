@@ -43,4 +43,8 @@ jobs:
         YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         PUSH_KEY: ${{ secrets.PUSH_KEY }}
         ALIYUN_REFRESH_TOKEN: ${{ secrets.ALIYUN_REFRESH_TOKEN }}
-      run: python monitor.py
+        YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
+      run: |
+        echo "$YOUTUBE_COOKIES" > cookies.txt
+        python monitor.py
+        rm -f cookies.txt
