@@ -30,7 +30,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install google-api-python-client requests
         pip install "yt-dlp>=2023.01.01"
-        pip install moviepy isodate
+        pip install "moviepy<2.0" isodate
         pip install aligo
         
     - name: Run Monitor Script
