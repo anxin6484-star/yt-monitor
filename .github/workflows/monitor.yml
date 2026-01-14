@@ -2,10 +2,10 @@ name: YouTube Black Horse Monitor
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Runs every 6 hours
-  workflow_dispatch:      # Allows manual triggering
+    - cron: '0 */6 * * *'  # Run every 6 hours
+  workflow_dispatch:
   push:
-    branches: [ "main" ]  # Run on push to main
+    branches: [ "main" ]
 
 jobs:
   monitor:
@@ -20,13 +20,22 @@ jobs:
       with:
         python-version: '3.9'
         
-    - name: Install dependencies
+    - name: Install System Dependencies (ffmpeg)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg
+        
+    - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install google-api-python-client requests
+        pip install "yt-dlp>=2023.01.01"
+        pip install moviepy isodate
+        pip install aligo
         
     - name: Run Monitor Script
       env:
         YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         PUSH_KEY: ${{ secrets.PUSH_KEY }}
+        ALIYUN_REFRESH_TOKEN: ${{ secrets.ALIYUN_REFRESH_TOKEN }}
       run: python monitor.py
