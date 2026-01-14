@@ -89,8 +89,16 @@ def download_video(url, video_id):
         'outtmpl': f'{DOWNLOAD_DIR}/{video_id}.%(ext)s',
         'quiet': True,
         'no_warnings': True,
-        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'user_agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.1',
         'referer': 'https://www.youtube.com/',
+        'external_downloader': 'aria2c',
+        'external_downloader_args': ['--min-split-size=1M', '--max-connection-per-server=8'],
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['ios', 'android', 'web'],
+            }
+        },
+        'nocheckcertificate': True,
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -269,6 +277,9 @@ def main():
             
             send_push(title, url, views, subs, multiplier, thumb_url, uploaded)
             found_count += 1
+            
+            # Anti-bot delay
+            time.sleep(10)
             
     print(f"Done. Processed {found_count} videos.")
 
